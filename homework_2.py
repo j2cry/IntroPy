@@ -64,7 +64,64 @@ def task_5():
 
 # 6*
 def task_6():
-    pass
+    from operator import itemgetter
+
+    # Step 1. Collecting data
+    input_format = '[number] [name] [price] [quantity] [unit]'
+    # if the number should not be requested from the user
+    # input_format = '[name] [price] [quantity] [unit]'
+    print(f"Input format: {input_format}")
+    data_collecting = True
+    goods = []
+
+    while data_collecting:
+        # data input
+        new_input = input("Enter product info (or 'exit'): ")
+        if new_input == 'exit':
+            data_collecting = False
+            continue
+
+        # Безопасно ли такое обращение? или лучше брать со среза? new_input = new_input[:].split()
+        new_input = new_input.split()  # NOTE: ?change the separator for ability to use spaces in the name?
+        # analyze input
+        try:
+            new_product = (int(new_input[0]), {'name': new_input[1], 'price': float(new_input[2]),
+                                               'quantity': float(new_input[3]), 'unit': new_input[4]})
+            # if the number should not be requested from the user:
+            # new_product = {'name': new_input[0], 'price': float(new_input[1]), 'quantity': float(new_input[2]),
+            #                'unit': new_input[3]}
+
+        except ValueError:  # price and/or quantity is not numeric
+            print('Invalid input format! Number, price and quantity must be numeric.')
+            # if the number should not be requested from the user:
+            # print('Invalid input format! Price and quantity must be numeric.')
+            continue
+        except IndexError:  # the number of specified parameters is less than necessary
+            print(f'Invalid input format! Format: {input_format}')
+            continue
+        else:
+            goods.append(new_product)
+
+    # if the number should not be requested from the user, generating the necessary data structure:
+    # goods = list(enumerate(goods, 1))
+
+    # Step 2. Analyzing data (matching keys in dicts is not required)
+    # collect unique keys from all dicts
+    keys = {key for num, product in goods for key in product.keys()}
+
+    # data conversion
+
+    # goods_analytics = dict()
+    # for key in keys:
+    #     values = []
+    #     for num, product in goods:
+    #         values.append(product.get(key))
+    #         goods_analytics[key] = values
+    # print(goods_analytics)
+
+    # products = [product for num, product in goods]
+    goods_analytics = {key: list(map(itemgetter(key), [product for num, product in goods])) for key in keys}
+    print(goods_analytics)
 
 
 if __name__ == "__main__":
