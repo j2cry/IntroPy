@@ -6,9 +6,9 @@ def task_1():     # using argparse - сделал просто ради посм
     """Salary calculation (using terminal)"""
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-wh', type=float, dest='working_hours')
-    parser.add_argument('-rt', type=float, dest='rate_per_hour')
-    parser.add_argument('-bs', type=float, dest='bonus')
+    parser.add_argument('-wh', type=float, dest='working_hours', required=True)
+    parser.add_argument('-rt', type=float, dest='rate_per_hour', required=True)
+    parser.add_argument('-bs', type=float, dest='bonus', required=True)
     args = parser.parse_args()
     print('Salary = ', round(args.working_hours * args.rate_per_hour + args.bonus, 2))
 
@@ -46,7 +46,7 @@ def task_2():
     print(modified)
 
     # checking with random data
-    data = DataRandom(int_bundle=(0, 100), elem_count=20, flags=DataRandom.FL_INT, nested_level=0)
+    data = DataRandom(int_bundle=(0, 100), elem_count=20, types=int, nested_level=0)
     source = data.random_list()
     modified = [nxt for cur, nxt in next_element(source) if nxt and nxt > cur]
     print(source)
@@ -68,7 +68,7 @@ def task_4():    # можно еще через collections.Counter(), но ко
     print(modified)
 
     # checking with random data
-    data = DataRandom(int_bundle=(0, 50), elem_count=20, flags=DataRandom.FL_INT, nested_level=0)
+    data = DataRandom(int_bundle=(0, 50), elem_count=20, types=int, nested_level=0)
     source = data.random_list()
     modified = [elem for elem in source if source.count(elem) == 1]
     print(source)
