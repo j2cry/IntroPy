@@ -84,27 +84,38 @@ def task_5():
 
 
 # 6
-def task_6():       # честно, не очень понял смысл задачи
-    """count() and cycle() usage"""
-    from itertools import count
-    from itertools import cycle
+def task_6():
+    """ Iterators based on count() and cycle() """
 
-    print('count() example:')
-    for num in count(12):
-        if num > 23:
-            print('STOPPED')
-            break
+    print('count() iterator:')
+    for num in task_6_iter_1(12, 23):
         print(num, end='->')
 
-    print('cycle() example:')
+    print('STOPPED\ncycle() iterator:')
+    for elem in task_6_iter_2(10):
+        print(elem, end=' ')
+    print('THE BEST!!!\n')
+
+
+def task_6_iter_1(start, finish):
+    from itertools import count
+    for num in count(start):
+        if num <= finish:
+            yield num
+        else:
+            return
+
+
+def task_6_iter_2(iter_count):      # по сути это itertools.repeat()
+    from itertools import cycle
     st = ['german', 'shepherds', 'are', 'the', 'best', 'dogs', '!']
     cnt = 0
-    for s in cycle(st):
-        print(s, end=' ')
+    for elem in cycle(st):
+        if cnt < iter_count:
+            yield elem
+        else:
+            return
         cnt += 1
-        if cnt == 17:
-            print('THE BEST!!!')
-            break
 
 
 # 7
