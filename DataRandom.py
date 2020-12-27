@@ -1,10 +1,5 @@
-from random import random
-from random import randint
-from random import choice
-from random import choices
-from string import ascii_letters
-from string import digits
-from string import punctuation
+from random import random, randint, choice, choices
+from string import ascii_letters, digits, punctuation
 from collections.abc import Iterable
 
 

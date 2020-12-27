@@ -75,6 +75,23 @@ def task_4():    # можно еще через collections.Counter(), но ко
     print(modified)
 
 
+def task_4_1():     # using collections.Counter
+    from collections import Counter
+    source = [2, 2, 2, 7, 23, 1, 44, 44, 3, 2, 10, 7, 4, 11]
+    source_counter = Counter(source).items()
+    modified = [key for key, val in source_counter if val == 1]
+    print(source)
+    print(modified)
+
+    # checking with random data
+    data = DataRandom(int_bundle=(0, 50), elem_count=20, types=int, nested_level=0)
+    source = data.random_list()
+    source_counter = Counter(source).items()
+    modified = [key for key, val in source_counter if val == 1]
+    print(source)
+    print(modified)
+
+
 # 5
 def task_5():
     """Product of all elements in range"""
@@ -150,6 +167,8 @@ if __name__ == '__main__':
             task_3()
         if cmd == '4':
             task_4()
+        if cmd == '4-1':
+            task_4_1()
         if cmd == '5':
             task_5()
         if cmd == '6':
