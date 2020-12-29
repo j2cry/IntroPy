@@ -2,11 +2,10 @@
 def task_1():
     """ Write inputted data to file """
     inp = input('#> ')
-    file = open('materials/task_1.txt', 'w', encoding='utf-8')
-    while inp:
-        file.write(inp + '\n')
-        inp = input('#1> ')
-    file.close()
+    with open('materials/task_1.txt', 'w', encoding='utf-8') as file:
+        while inp:
+            file.write(inp + '\n')
+            inp = input('#1> ')
 
 
 # 2
@@ -85,10 +84,9 @@ def task_5():
         file.write(' '.join([str(num) for num in numbers]))
 
     with open('materials/task_5.txt', 'r', encoding='utf-8') as file:  # reading
-        # компактно, но кмк логичнее разделить несвязанные друг с другом манипуляции:
+        # можно чтение из файла и обработку прочитанных данных запилить в одну строку:
         # numbers = [int(elem) for elem in file.readline().split()]
         line = file.readline()
-
     numbers = [int(elem) for elem in line.split()]
     print(sum(numbers))
 
@@ -120,24 +118,21 @@ def task_6_gen():  # cheat: совсем неохота заполнять ку�
     # как правильнее ловить исключения связанные с чтением/записью файлов?
     # кмк, в моем варианте очень много лишнего кода в блоке try
     try:
-        file = open('materials/task_6.txt', 'w', encoding='utf-8')
+        with open('materials/task_6.txt', 'w', encoding='utf-8') as file:
+            for subj in subjects:
+                lectures = randint(-64, 128)
+                seminars = randint(-64, 128)
+                labs = randint(-64, 128)
 
-        for subj in subjects:
-            lectures = randint(-64, 128)
-            seminars = randint(-64, 128)
-            labs = randint(-64, 128)
-
-            new_line = f'{subj}:'
-            new_line += f' {lectures} lectures' if lectures > 0 else ''
-            new_line += f' {seminars} seminars' if seminars > 0 else ''
-            new_line += f' {labs} labs' if labs > 0 else ''
-            new_line += '\n'
-            file.write(new_line)
+                new_line = f'{subj}:'
+                new_line += f' {lectures} lectures' if lectures > 0 else ''
+                new_line += f' {seminars} seminars' if seminars > 0 else ''
+                new_line += f' {labs} labs' if labs > 0 else ''
+                new_line += '\n'
+                file.write(new_line)
     except OSError:
         print('Unable to write file!')
         return
-    else:
-        file.close()
 
 
 # 7
@@ -174,6 +169,7 @@ def task_7():
     # dump to JSON
     with open('materials/task_7.json', 'w', encoding='utf-8') as file:
         json.dump(analytics, file)
+    print('Done.')
 
 
 def task_7_gen(count=15):
