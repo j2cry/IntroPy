@@ -29,7 +29,7 @@ class TrafficLightThread:
 
     def __change_color(self):
         """ Set traffic light to the next state """
-        print('Traffic light is turned up.')
+        print('Traffic light is turned up in loop mode.')
         states_generator = self.__get_next_color()
         while self.__running:
             # get next state
@@ -45,6 +45,15 @@ class TrafficLightThread:
         else:
             return
 
+
+def task_1_1():
+    """ Test for task 1 v1 """
+    if not light_1.running:
+        light_1.run()
+    else:
+        light_1.stop()
+
+
 # 1 v2
 class TrafficLightScheduler:
     def __init__(self, iterations=6):
@@ -57,7 +66,7 @@ class TrafficLightScheduler:
 
     def run(self):
         """ Turn on the traffic light """
-        print(f'Traffic light starts!')
+        print(f'Traffic light is turned up.')
         self.__light_changer.run()
 
     def stop(self):
@@ -65,7 +74,7 @@ class TrafficLightScheduler:
         self.__color = ''
         if not self.__light_changer.empty():
             self.__light_changer.cancel(self.__next_state_event)
-        print('Traffic light is off.')
+        print('Traffic light is turned down.')
 
     def __change_state(self):
         """ Set traffic light to the next state """
@@ -90,6 +99,12 @@ class TrafficLightScheduler:
                 return
 
 
+def task_1_2():
+    """ Test for task 1 v2 """
+    light_2 = TrafficLightScheduler()
+    light_2.run()
+
+
 # 2
 class Road:
     def __init__(self, length, width):
@@ -100,6 +115,12 @@ class Road:
         """ Count mass of asphalt, required for the all road
             mass_per_unit: mass of asphalt, required for 1x1x0.01 m of the road"""
         return self._length * self._width * mass_per_square * height
+
+
+def task_2():
+    """ Test for task 2 """
+    road = Road(5000, 20)
+    print(road.mass_count(5), 'kg')
 
 
 # 3
@@ -117,6 +138,12 @@ class Position(Worker):
 
     def get_total_income(self):
         return sum(self._income.values())
+
+
+def task_3():
+    """ Test for task 3 """
+    worker = Position('Adam', 'Jensen', 'Chief of Security', 8320, 4750)
+    print('Full name:', *worker.get_full_name(), 'Total income:', worker.get_total_income())
 
 
 #4
@@ -180,6 +207,22 @@ class PoliceCar(Car):
         super().__init__(name, color, speed, is_police=True)
 
 
+def task_4():
+    """ Test for task 4 """
+    cars = [Car('Car', 'red', 0, False),
+            TownCar('Town car', 'blue', 0, False),
+            WorkCar('Taxi', 'yellow', 150, False),
+            PoliceCar('Police car', 'white', 0)]
+
+    for car in cars:
+        print(car.status())
+        for spd in range(30, 71, 20):
+            car.go(spd)
+            car.turn(randint(0, 361))
+            print(car.status())
+        print('')
+
+
 # 5
 class Stationery:
     def __init__(self):
@@ -204,50 +247,25 @@ class Handle(Stationery):
         return 'Drawing with handle.'
 
 
+def task_5():
+    """ Test for task 5 """
+    office_supplies = [Stationery(), Pen(), Pencil(), Handle()]
+    for supply in office_supplies:
+        print(supply.draw())
+
+
 # main
 if __name__ == '__main__':
     running = True
+    # кажется, я начал понимать, как это работает
+    tasks = {'1-1': task_1_1, '1-2': task_1_2, '2': task_2, '3': task_3, '4': task_4, '5': task_5}
     light_1 = TrafficLightThread()
 
     while running:
         cmd = input('> ')
-        if cmd == 'q':
+
+        if cmd in tasks.keys() and callable(tasks.get(cmd)):
+            tasks.get(cmd)()
+        elif cmd == 'q':
             running = False
-            continue
-
-        if cmd == '1-1':
-            if not light_1.running:
-                light_1.run()
-            else:
-                light_1.stop()
-
-        if cmd == '1-2':
-            light_2 = TrafficLightScheduler()
-            light_2.run()
-
-        if cmd == '2':
-            road = Road(5000, 20)
-            print(road.mass_count(5), 'kg')
-
-        if cmd == '3':
-            worker = Position('Adam', 'Jensen', 'Chief of Security', 8320, 4750)
-            print('Full name:', *worker.get_full_name(), 'Total income:', worker.get_total_income())
-
-        if cmd == '4':
-            cars = [Car('Car', 'red', 0, False),
-                    TownCar('Town car', 'blue', 0, False),
-                    WorkCar('Taxi', 'yellow', 150, False),
-                    PoliceCar('Police car', 'white', 0)]
-
-            for car in cars:
-                print(car.status())
-                for spd in range(30, 71, 20):
-                    car.go(spd)
-                    car.turn(randint(0, 361))
-                    print(car.status())
-                print('')
-
-        if cmd == '5':
-            office_supplies = [Stationery(), Pen(), Pencil(), Handle()]
-            for supply in office_supplies:
-                print(supply.draw())
+            # continue  # вернуть, если добавится что-либо после блока if
