@@ -7,7 +7,7 @@ from random import randint
 
 # 1 v1
 class TrafficLightThread:
-    def __init__(self, iterations=6):
+    def __init__(self):
         self.__states = {'red': 7, 'yellow': 2, 'green': 5}
         self.__color = ''
         self.__running = False
@@ -54,6 +54,7 @@ def task_1_1():
         light_1.stop()
 
 
+
 # 1 v2
 class TrafficLightScheduler:
     def __init__(self, iterations=6):
@@ -86,7 +87,8 @@ class TrafficLightScheduler:
             return
         print(f'Traffic light color: {self.__color}')
         # set scheduler
-        self.__next_state_event = self.__light_changer.enter(self.__states.get(self.__color), 1, self.__change_state, ())
+        self.__next_state_event = self.__light_changer.enter(self.__states.get(self.__color), 1,
+                                                             self.__change_state, ())
 
     def __get_next_color(self):
         """ Get next state of traffic light """
@@ -146,7 +148,7 @@ def task_3():
     print('Full name:', *worker.get_full_name(), 'Total income:', worker.get_total_income())
 
 
-#4
+# 4
 class Car:
     def __init__(self, name, color, speed, is_police):
         self._speed = speed
