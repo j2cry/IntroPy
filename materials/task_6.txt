@@ -1,18 +1,18 @@
-Physics: 33 lectures 83 seminars 12 labs
-Psychology: 44 seminars 58 labs
-History: 44 lectures 59 seminars 85 labs
-Health: 66 lectures 90 seminars
-PE (physical education): 59 seminars 102 labs
-Geography: 116 lectures 23 seminars 109 labs
-Maths: 2 lectures 59 seminars 72 labs
-Geometry: 43 lectures 81 seminars 42 labs
-Music: 30 lectures 61 labs
-Biology: 25 lectures 105 seminars
-Computer science: 109 seminars 102 labs
-English: 90 lectures 34 seminars 104 labs
-Algebra: 78 lectures 75 seminars 126 labs
-Chemistry: 63 lectures 119 seminars 9 labs
-Foreign language: 86 lectures 31 seminars
-Art: 20 labs
-Social studies: 81 seminars 34 labs
-Literature: 62 lectures 73 seminars 61 labs
+PE (physical education): 48 seminars 
+Art: 77 lectures 113 seminars 
+Maths: 19 labs
+Social studies: 62 seminars 51 labs
+History: 5 lectures 42 labs
+Geometry: 23 lectures 49 labs
+Algebra: 29 labs
+Chemistry: 22 lectures 104 labs
+Literature: 88 lectures 126 seminars 
+Foreign language: 66 lectures 52 seminars 
+Psychology: 12 lectures 81 seminars 14 labs
+Music: 41 lectures 108 seminars 90 labs
+English: 66 seminars 102 labs
+Biology: 76 lectures 
+Computer science: 48 lectures 33 labs
+Physics: 114 lectures 20 seminars 24 labs
+Health: 46 lectures 93 seminars 
+Geography: 117 lectures 93 seminars 36 labs

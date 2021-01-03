@@ -41,10 +41,11 @@ def task_3(bound=20000):
         line = file.readline()
         staff_salaries = {}
         while line:
-            name = ' '.join(line.split()[:-1])
+            parse = line.split()
+            name = ' '.join(parse[:-1])
             # тут хорошо бы добавить проверку, чтоб не напороться на ValueError, но она мне видится актуальной только
             # в случае создания/редактирования анализируемого файла конечным пользователем вручную
-            staff_salaries[name] = float(line.split()[-1])
+            staff_salaries[name] = float(parse[-1])
             line = file.readline()
     average_salary = round(mean(staff_salaries.values()), 2)
     print(f'Average salary equals {average_salary}')
@@ -78,7 +79,7 @@ def task_4():
 # 5
 def task_5():
     """ Calc the sum of integers from file """
-    from DataRandom import DataRandom  # опять пригодился :)
+    from data_random import DataRandom  # опять пригодился :)
     numbers = DataRandom(int_bundle=(-100, 100), elem_count=40, types=int, nested_level=0).random_list()
     with open('materials/task_5.txt', 'w', encoding='utf-8') as file:  # writing
         file.write(' '.join([str(num) for num in numbers]))
@@ -124,11 +125,9 @@ def task_6_gen():  # cheat: совсем неохота заполнять ку�
                 seminars = randint(-64, 128)
                 labs = randint(-64, 128)
 
-                new_line = f'{subj}:'
-                new_line += f' {lectures} lectures' if lectures > 0 else ''
-                new_line += f' {seminars} seminars' if seminars > 0 else ''
-                new_line += f' {labs} labs' if labs > 0 else ''
-                new_line += '\n'
+                new_line = f'{subj}: {f"{lectures} lectures " if lectures > 0 else ""}' \
+                           f'{f"{seminars} seminars " if seminars > 0 else ""}' \
+                           f'{f"{labs} labs" if labs > 0 else ""}\n'
                 file.write(new_line)
     except OSError:
         print('Unable to write file!')
