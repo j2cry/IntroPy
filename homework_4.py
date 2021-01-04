@@ -1,4 +1,4 @@
-from DataRandom import DataRandom
+from data_random import DataRandom
 
 
 # 1
