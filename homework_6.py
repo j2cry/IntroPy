@@ -22,7 +22,6 @@ class TrafficLightThread:
         """ Turn off the traffic light """
         self.__running = False
 
-    @property
     def running(self):
         """ Get traffic light running status """
         return self.__running
@@ -40,10 +39,7 @@ class TrafficLightThread:
 
     def __get_next_color(self):
         """ Get next state of traffic light """
-        for state in cycle(self.__states):
-            yield state
-        else:
-            return
+        yield from cycle(self.__states)
 
 
 def task_1_1():
@@ -52,7 +48,6 @@ def task_1_1():
         light_1.run()
     else:
         light_1.stop()
-
 
 
 # 1 v2
@@ -92,13 +87,11 @@ class TrafficLightScheduler:
 
     def __get_next_color(self):
         """ Get next state of traffic light """
-        cnt = 0
-        for state in cycle(self.__states):
-            if cnt < self.__iterations:
-                yield state
-                cnt += 1
-            else:
-                return
+        count = 0
+        states = cycle(self.__states)
+        while count < self.__iterations:
+            yield next(states)
+            count += 1
 
 
 def task_1_2():
