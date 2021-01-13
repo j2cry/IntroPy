@@ -9,9 +9,9 @@ from random import randint
 class TrafficLightThread:
     def __init__(self):
         self.__states = {'red': 7, 'yellow': 2, 'green': 5}
-        self.__color = ''
+        # self.__color = ''
         self.__running = False
-        self.__light_changer = Thread(target=self.__change_color)
+        self.__light_changer = Thread(target=self.__working_cycle)
 
     def run(self):
         """ Turn on the traffic light """
@@ -22,19 +22,23 @@ class TrafficLightThread:
         """ Turn off the traffic light """
         self.__running = False
 
+    @property
     def running(self):
         """ Get traffic light running status """
         return self.__running
 
-    def __change_color(self):
+    def __working_cycle(self):
         """ Set traffic light to the next state """
         print('Traffic light is turned up in loop mode.')
         states_generator = self.__get_next_color()
         while self.__running:
             # get next state
-            self.__color = next(states_generator)
-            print(f'Traffic light color: {self.__color}')
-            sleep(self.__states.get(self.__color))
+            # self.__color = next(states_generator)
+            # print(f'Traffic light color: {self.__color}')
+            # sleep(self.__states.get(self.__color))
+            color = next(states_generator)
+            print(f'Traffic light color: {color}')
+            sleep(self.__states.get(color))
         print('Traffic light is turned down.')
 
     def __get_next_color(self):
@@ -143,7 +147,7 @@ def task_3():
 
 # 4
 class Car:
-    def __init__(self, name, color, speed, is_police):
+    def __init__(self, name, color, speed, is_police=False):
         self._speed = speed
         self._color = color
         self._name = name
@@ -179,17 +183,18 @@ class Car:
 
 
 class TownCar(Car):
-    def __init__(self, name, color, speed, is_police):
-        super().__init__(name, color, speed, is_police)
+    def __init__(self, name, color, speed):
+        super().__init__(name, color, speed)
         self._max_speed = 60
 
     def show_speed(self):
-        return f'Your speed is {self._speed}. {"You are over-speeding. " if self._speed > self._max_speed else ""}'
+        speed_info = super().show_speed()
+        return f'{speed_info}{"You are over-speeding. " if self._speed > self._max_speed else ""}'
 
 
 class WorkCar(TownCar):
-    def __init__(self, name, color, speed, is_police):
-        super().__init__(name, color, speed, is_police)
+    def __init__(self, name, color, speed):
+        super().__init__(name, color, speed)
         self._max_speed = 40
 
 
@@ -204,9 +209,9 @@ class PoliceCar(Car):
 
 def task_4():
     """ Test for task 4 """
-    cars = [Car('Car', 'red', 0, False),
-            TownCar('Town car', 'blue', 0, False),
-            WorkCar('Taxi', 'yellow', 150, False),
+    cars = [Car('Car', 'red', 0),
+            TownCar('Town car', 'blue', 0),
+            WorkCar('Taxi', 'yellow', 150),
             PoliceCar('Police car', 'white', 0)]
 
     for car in cars:
