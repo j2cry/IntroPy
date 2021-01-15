@@ -23,7 +23,9 @@ class Matrix:
         result = ''
         for row in self.__values:
             row = map(str, row)
-            result += ' '.join(row) + '\n'
+            for value in row:
+                result += f'{value:>4}'
+            result += '\n'
         return result
 
     def __getitem__(self, index: [int, int]):
@@ -94,7 +96,7 @@ def task_1():
     data = DataRandom(elem_count=4, nested_elem_count=10, int_bundle=(-20, 20), types=int, nested_level=1)
     mtx1 = Matrix(data.random_list())
     mtx2 = Matrix(data.random_list())
-    print(mtx1, '\n', mtx2)
+    print(mtx1, '\n', mtx2, sep='')
     mtx = mtx1 + mtx2
     print(mtx)
 
@@ -106,6 +108,7 @@ def task_1():
 
 # 2 v1
 class Clothes:
+    """ Base class """
     def __init__(self, model=''):
         self._model = model
 
@@ -129,6 +132,7 @@ class Suit(Clothes):
         super().__init__(model)
         self.__height = height
 
+    @property
     def calc_consumption(self):
         return 2 * self.__height + 0.3
 
@@ -136,7 +140,7 @@ class Suit(Clothes):
 def task_2_1():
     print('Task 2 v1 started.')
     item = Suit(172)
-    print(item.calc_consumption())
+    print(item.calc_consumption)
     item = Coat(46)
     print(item.calc_consumption)
     print('Task 2 v1 finished.')
@@ -168,7 +172,76 @@ def task_2_2():
     print('Task 2 v2 finished.')
 
 
+# 3
+# гугл сошелся на мнении, что декоратор вне класса проще и понятнее
+def same_type(function):
+    """ Decorator: check if all values are the same type """
+    def wrapper(self, arg):
+        if isinstance(self, type(arg)):
+            result = function(self, arg)
+        else:
+            result = None
+        return result
+    return wrapper
+
+
+class Cell:
+    def __init__(self, parts: int):
+        self.parts = parts
+
+    def __str__(self):
+        return str(self.parts)
+
+    @same_type
+    def __add__(self, other):
+        return Cell(self.parts + other.parts)
+
+    @same_type
+    def __sub__(self, other):
+        sub_parts = self.parts - other.parts
+        return Cell(sub_parts) if sub_parts > 0 else None
+
+    @same_type
+    def __mul__(self, other):
+        return Cell(self.parts * other.parts)
+
+    @same_type
+    def __truediv__(self, other):
+        return Cell(self.parts // other.parts)
+
+    def make_order(self, parts_in_row):
+        """ Get parts in order """
+        result = ''
+        for part in range(1, self.parts + 1):
+            end_of_row = '' if part % parts_in_row else '\n'
+            result += ''.join('*' + end_of_row)
+        return result
+
+
+def task_3():
+    print('Task 3 started.')
+    cell_1 = Cell(12)
+    cell_2 = Cell(5)
+    print('source:', cell_1, cell_2)
+    print('sum:', cell_1 + cell_2)
+    print('sub1-2:', cell_1 - cell_2)
+    print('sub2-1:', cell_2 - cell_1)
+    print('mul:', cell_1 * cell_2)
+    print('div:', cell_1 / cell_2)
+
+    print(cell_1.make_order(7), '\n')
+    print(cell_2.make_order(7))
+    print('Task 3 finished.')
+
+
 # main
-# task_1()
-# task_2_1()
-# task_2_2()
+if __name__ == '__main__':
+    tasks = {'1': task_1, '2-1': task_2_1, '2-2': task_2_2, '3': task_3}
+
+    running = True
+    while running:
+        inp = input('> ')
+        if inp == 'q':
+            running = False
+        elif callable(tasks.get(inp)):
+            tasks.get(inp)()
