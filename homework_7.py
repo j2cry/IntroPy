@@ -21,11 +21,14 @@ class Matrix:
 
     def __str__(self):
         result = ''
+        # for row in self.__values:
+        #     row = map(str, row)
+        #     for value in row:
+        #         result += f'{value:>4}'
+        #     result += '\n'
         for row in self.__values:
-            row = map(str, row)
-            for value in row:
-                result += f'{value:>4}'
-            result += '\n'
+            row = [f'{value:>4}' for value in row]
+            result += ''.join(row) + '\n'
         return result
 
     def __getitem__(self, index: [int, int]):
