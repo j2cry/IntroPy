@@ -1,6 +1,7 @@
 from calendar import monthrange
 from data_random import DataRandom
 from typing import Union
+from product_1 import Printer, Scanner, CopyMachine
 
 
 # 1
@@ -94,6 +95,8 @@ def test_task_3():
 
 
 # 4, 5, 6
+class Storage:
+    pass
 
 
 # 7 для этого вроде бы есть класс Complex в модуле numbers
