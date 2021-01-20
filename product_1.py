@@ -1,27 +1,42 @@
-from abc import ABCMeta, abstractmethod
-from typing import Union, Final, final
+from abc import ABCMeta
+from typing import Final
 
 
 class Product(metaclass=ABCMeta):
-    """ Base class for products in storage """
+    """ Base class for products in storage. """
 
     _value_not_defined: Final = 'not defined'          # default not-defined value
 
-    # parameters containers     TODO: заменить их на dict?
+    # parameters containers
+    # set можно заменить на dict, тогда можно будет задать начальные значения как во 2ом варианте, но не вижу смысла
     _read_only = {'serial'}
     _primary = {'location', 'serial', 'mass', 'size'}
     _additional = {'warranty'}
 
-    _predefined = _primary | _additional
-    # _other = set()
+    # _predefined = _primary | _additional
+    __categories = {'read_only': _read_only,
+                    'primary': _primary,
+                    'additional': _additional}
+
+    def __new__(cls, *args, **kwargs):
+        """ Constructor for collecting parameter containers from all class tree: child --> parent """
+        cls._predefined = set()
+        for category_name in cls.__categories.keys():
+            container = set()
+            for parent_class in cls.mro():
+                container |= getattr(parent_class, '_' + category_name, set())
+            setattr(cls, '_' + category_name, container)
+            # collect _predefined container
+            cls._predefined |= container if category_name != 'read_only' else set()
+        return super(Product, cls).__new__(cls)
 
     def __init__(self, **parameters):
-        self.__parameters = {}
-        # adding predefined
-        self.__parameters.update({key: self._value_not_defined for key in self._predefined})
         if 'serial' not in parameters.keys():
             parameters |= {'serial': self.__hash__()}
-        self.update_parameters(**parameters)
+        # initialize parameters
+        predefined = {param_name: self._value_not_defined for param_name in self._predefined}
+        self.__parameters = {}
+        self.update_parameters(**predefined | parameters)
 
     def __str__(self):
         """ Get product info card """
@@ -29,12 +44,13 @@ class Product(metaclass=ABCMeta):
         # primary parameters
         location = self._print_parameter(self.__parameters.get('location'))
         serial = self._print_parameter(self.__parameters.get('serial'))
-        size = self._print_parameter(self.__parameters.get('size'), lambda res: ' x '.join([str(value) for value in res]))
+        size = self._print_parameter(self.__parameters.get('size'),
+                                     lambda res: ' x '.join([str(value) for value in res]))
         mass = self._print_parameter(self.__parameters.get('mass'))
 
-        parameters = [f'  {key.replace("_", " ")}: {value}{" !" if key in self._additional else ""}'
-                      for key, value in self.__parameters.items()
-                      if key not in self._primary and value != self._value_not_defined]
+        parameters = [f'  {param_name.replace("_", " ")}: {value}{" !" if param_name in self._additional else ""}'
+                      for param_name, value in self.__parameters.items()
+                      if param_name not in self._primary and value != self._value_not_defined]
 
         result = f'Product type: {type(self).__name__}{nl}' \
                  f'S/N: {serial}{nl}' \
@@ -51,31 +67,39 @@ class Product(metaclass=ABCMeta):
         """ Override it to add something to product info card """
         return ''
 
-    def _print_parameter(self, name, action=None):
+    def _print_parameter(self, param_name, action=None):
         """ Get formatted parameter. If parameter not exists return default 'not defined' value """
-        if name and name != self._value_not_defined:
-            return action(name) if action else name
+        if param_name and param_name != self._value_not_defined:
+            return action(param_name) if action else param_name
         else:
             return self._value_not_defined
 
     def update_parameters(self, **parameters):
         """ Add & Update parameters dict with new dict and locals """
-        # self._other = parameters.keys() - self._predefined    # update container
         self.__parameters.update(parameters)    # add new params
 
     def remove_parameters(self, *parameters):
         """ Remove specified parameters from dict. Predefined parameters set to default not-defined """
-        for key in parameters:
-            if key not in self._read_only:
-                if key in self._predefined:
-                    self.__parameters[key] = self._value_not_defined
+        for param_name in parameters:
+            if param_name not in self._read_only:
+                if param_name in self._predefined:
+                    self.__parameters[param_name] = self._value_not_defined
                 else:
-                    self.__parameters.pop(key, None)
+                    self.__parameters.pop(param_name, None)
+
+    def get_parameters(self, category: str = None):
+        """ Get parameters in specified category. Return JUST PREDEFINED parameters if category is not specified!
+            To get ALL actual parameters use 'all' category """
+        # это просто ради одинаковости интерфейса с вариантом 2
+        return {param_name: value for param_name, value in self.__parameters.items()
+                if param_name in self.__categories.get(category)} if category != 'all' else self.__parameters
 
 
 class Printer(Product):
     _additional = {'conditions'}
-    pass
+
+    def _additional_output(self, source: str):
+        return f'[ Here might be some your info (C) {self.__class__.__name__} class]'
 
 
 class Scanner(Product):
@@ -86,21 +110,14 @@ class CopyMachine(Product):
     pass
 
 
-# prod1 = Printer()
-# print(prod1)
-# prod1.update_parameters(location='A22', warranty='1 year', shipping_date='13.04.2021')
-# print(prod1)
-# prod1.remove_parameters('serial', 'location')
-# print(prod1)
+if __name__ == '__main__':
+    prod1 = Printer(mass=90, size=(0.3, 0.4, 0.22))
+    print('Object created:', prod1, sep='\n')
+    prod1.update_parameters(serial='HX92', location='A3-73', conditions='Do not freeze')
+    print('Parameters added:', prod1, sep='\n')
+    prod1.update_parameters(serial='HX92A37-14', location='A7-19', warranty='2 years')
+    print('Parameters updated:', prod1, sep='\n')
+    prod1.remove_parameters('conditions', 'mass', 'serial')
+    print('Parameters removed:', prod1, sep='\n')
 
-
-prod1 = Printer(mass=90, size=(0.3, 0.4, 0.22))
-prod2 = Scanner(another='Some information')
-prod3 = CopyMachine(serial='HX92', location='A3-73')
-
-prod1.update_parameters(conditions='Brooklyn')
-print(prod1)
-prod1.remove_parameters('gotcha', 'mass')
-print(prod1)
-print(prod2)
-print(prod3)
+    print(prod1.get_parameters('all'))

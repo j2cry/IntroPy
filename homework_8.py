@@ -96,7 +96,24 @@ def test_task_3():
 
 # 4, 5, 6
 class Storage:
-    pass
+    def __init__(self):
+        pass
+
+    def add_products(self, *products):
+        """ Add products to storage """
+        pass
+
+    def del_products(self, *id):
+        """ Delete products from storage by it's ID (hash?) """
+        pass
+
+    def find_product(self, **parameters):
+        """ Find product with specified parameters """
+        pass
+
+    def update_product_info(self, id, **parameters):
+        """ Update product parameters """
+        pass
 
 
 # 7 для этого вроде бы есть класс Complex в модуле numbers
