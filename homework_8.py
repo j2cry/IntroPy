@@ -1,6 +1,6 @@
 from calendar import monthrange
 from data_random import DataRandom
-from typing import Union
+from typing import Union, Tuple
 from product_1 import Printer, Scanner, CopyMachine
 
 
@@ -48,7 +48,7 @@ def test_task_1():      # это можно скормить Pytest
 
 
 # 2
-class MeaninglessException(Exception):
+class OutOfStockException(Exception):
     pass
 
 
@@ -59,11 +59,11 @@ def test_task_2():
     for a, b in values:
         try:
             if b <= 0:      # set any condition to raise exception
-                raise MeaninglessException("Something happened. Go next.")
+                raise OutOfStockException("Something happened. Go next.")
             else:
                 print(round(a / b, 3))
 
-        except MeaninglessException as e:
+        except OutOfStockException as e:
             print(e)
 
 
@@ -97,23 +97,49 @@ def test_task_3():
 # 4, 5, 6
 class Storage:
     def __init__(self):
-        pass
+        self.__storage = {}
 
     def add_products(self, *products):
         """ Add products to storage """
-        pass
+        for product in products:
+            product_type = product.__class__.__name__
+            if product_type in self.__storage.keys():
+                self.__storage.get(product_type).add(product)
+            else:
+                self.__storage.update({product_type: {product}})
 
-    def del_products(self, *id):
-        """ Delete products from storage by it's ID (hash?) """
-        pass
+    def del_products(self, **products) -> Tuple[str, set]:
+        """ Delete products from storage. Returns status message and list of deleted items """
+        container = set()
+        message = ''
+        for product_type, count in products.items():
+            if product_type in self.__storage.keys():
+                for cnt in range(count):
+                    try:
+                        # container.add(set().pop())
+                        container.add(self.__storage.get(product_type).pop())
+                    except KeyError:
+                        message += f'{product_type} is out of stock! Missing {count - cnt} unit(s).\n'
+                        # или например так
+                        # raise OutOfStockException(f'Product type: {product_type} is out of stock!')
+            else:
+                message += f'No such product type in stock ({product_type})'
+                # или тоже raise Какой-нибудьException например
+        return message, container
 
-    def find_product(self, **parameters):
-        """ Find product with specified parameters """
-        pass
+    # а дальше можно еще через Counter() сделать вывод об остатках на складе,
+    # прикрутить интерфейс для поиска товаров по параметрам
 
-    def update_product_info(self, id, **parameters):
-        """ Update product parameters """
-        pass
+
+def test_task_456():
+    storage = Storage()
+    storage.add_products(Printer(), Printer(), Scanner())
+    msg, deleted = storage.del_products(Printer=1, Scanner=2, CopyMachine=1)
+    print(msg)
+
+    print('Deleted items:')
+    for item in deleted:
+        print(item)
 
 
 # 7 для этого вроде бы есть класс Complex в модуле numbers
@@ -175,9 +201,9 @@ def test_task_7():      # скормить Pytest
 
 # main
 if __name__ == '__main__':
-    # tasks = {'1': test_task_1, '2': test_task_2, '3': test_task_3, '4': test_task_4, '5': test_task_5,
-    #          '6': test_task_6, '7': test_task_7}
-    tasks = {'1': test_task_1, '2': test_task_2, '3': test_task_3, '7': test_task_7}
+    tasks = {'1': test_task_1, '2': test_task_2, '3': test_task_3, '4': test_task_456, '5': test_task_456,
+             '6': test_task_456, '7': test_task_7}
+    # tasks = {'1': test_task_1, '2': test_task_2, '3': test_task_3, '7': test_task_7}
 
     running = True
     while running:

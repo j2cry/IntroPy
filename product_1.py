@@ -5,15 +5,13 @@ from typing import Final
 class Product(metaclass=ABCMeta):
     """ Base class for products in storage. """
 
-    _value_not_defined: Final = 'not defined'          # default not-defined value
+    _value_not_defined: Final = 'not defined'  # default not-defined value
 
     # parameters containers
-    # set можно заменить на dict, тогда можно будет задать начальные значения как во 2ом варианте, но не вижу смысла
     _read_only = {'serial'}
     _primary = {'location', 'serial', 'mass', 'size'}
     _additional = {'warranty'}
 
-    # _predefined = _primary | _additional
     __categories = {'read_only': _read_only,
                     'primary': _primary,
                     'additional': _additional}
@@ -24,18 +22,24 @@ class Product(metaclass=ABCMeta):
         for category_name in cls.__categories.keys():
             container = set()
             for parent_class in cls.mro():
+                # для коллекций уникальных значений сойдет и так:
                 container |= getattr(parent_class, '_' + category_name, set())
+                # но на будущее: лучше бы это собирать аккуратнее, а то появятся прогрессирующие дублирования
+
             setattr(cls, '_' + category_name, container)
             # collect _predefined container
             cls._predefined |= container if category_name != 'read_only' else set()
+        cls.__categories.update({'predefined': cls._predefined})    # and finally update it
         return super(Product, cls).__new__(cls)
 
     def __init__(self, **parameters):
-        if 'serial' not in parameters.keys():
-            parameters |= {'serial': self.__hash__()}
+        self.__parameters = {}
+        # set read_only parameters
+        serial = {'serial': parameters.get('serial') if 'serial' in parameters.keys() else self.__hash__()}
+        self.__parameters.update(serial)
+
         # initialize parameters
         predefined = {param_name: self._value_not_defined for param_name in self._predefined}
-        self.__parameters = {}
         self.update_parameters(**predefined | parameters)
 
     def __str__(self):
@@ -48,9 +52,10 @@ class Product(metaclass=ABCMeta):
                                      lambda res: ' x '.join([str(value) for value in res]))
         mass = self._print_parameter(self.__parameters.get('mass'))
 
-        parameters = [f'  {param_name.replace("_", " ")}: {value}{" !" if param_name in self._additional else ""}'
+        parameters = [f'  {param_name.replace("_", " ")}: {value}'
+                      f'{" !" if param_name in self.get_parameters("additional").keys() else ""}'
                       for param_name, value in self.__parameters.items()
-                      if param_name not in self._primary and value != self._value_not_defined]
+                      if param_name not in self.get_parameters("primary").keys() and value != self._value_not_defined]
 
         result = f'Product type: {type(self).__name__}{nl}' \
                  f'S/N: {serial}{nl}' \
@@ -76,18 +81,19 @@ class Product(metaclass=ABCMeta):
 
     def update_parameters(self, **parameters):
         """ Add & Update parameters dict with new dict and locals """
-        self.__parameters.update(parameters)    # add new params
+        self.__parameters.update({param_name: value for param_name, value in parameters.items()
+                                  if param_name not in self.get_parameters("read_only").keys()})  # add new params
 
     def remove_parameters(self, *parameters):
         """ Remove specified parameters from dict. Predefined parameters set to default not-defined """
         for param_name in parameters:
-            if param_name not in self._read_only:
-                if param_name in self._predefined:
+            if param_name not in self.get_parameters("read_only").keys():
+                if param_name in self.get_parameters().keys():
                     self.__parameters[param_name] = self._value_not_defined
                 else:
                     self.__parameters.pop(param_name, None)
 
-    def get_parameters(self, category: str = None):
+    def get_parameters(self, category: str = 'predefined'):
         """ Get parameters in specified category. Return JUST PREDEFINED parameters if category is not specified!
             To get ALL actual parameters use 'all' category """
         # это просто ради одинаковости интерфейса с вариантом 2
@@ -111,7 +117,7 @@ class CopyMachine(Product):
 
 
 if __name__ == '__main__':
-    prod1 = Printer(mass=90, size=(0.3, 0.4, 0.22))
+    prod1 = Printer(mass=90, size=(0.3, 0.4, 0.22), serial='serial')
     print('Object created:', prod1, sep='\n')
     prod1.update_parameters(serial='HX92', location='A3-73', conditions='Do not freeze')
     print('Parameters added:', prod1, sep='\n')

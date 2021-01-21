@@ -46,12 +46,14 @@ class Product(metaclass=ABCMeta):
     _value_not_defined = 'not defined'
 
     def __init__(self, **parameters):
-        if 'serial' not in parameters.keys():
-            parameters |= {'serial': self.__hash__()}
+        self.__parameters = {}
+        # set read_only parameters
+        serial = {'serial': parameters.get('serial') if 'serial' in parameters.keys() else self.__hash__()}
+        self.__parameters.update(serial)
+
         # initialize parameters
         predefined = {param_name: value if value else self._value_not_defined
                       for param_name, value in self.get_parameters().items() if param_name not in parameters}
-        self.__parameters = {}
         self.update_parameters(**predefined | parameters)
 
     def __str__(self):
@@ -99,7 +101,8 @@ class Product(metaclass=ABCMeta):
 
     def update_parameters(self, **parameters):
         """ Add & Update parameters dict with new dict and locals """
-        self.__parameters.update(parameters)  # add new params
+        self.__parameters.update({param_name: value for param_name, value in parameters.items()
+                                  if param_name not in self.get_parameters("read_only").keys()})    # add new params
         self._save_predefined_parameters()  # save predefined params
 
     def remove_parameters(self, *parameters: str):
@@ -164,7 +167,7 @@ class CopyMachine(Product):
 
 
 if __name__ == '__main__':
-    prod1 = Printer(mass=90, size=(0.3, 0.4, 0.22))
+    prod1 = Printer(mass=90, size=(0.3, 0.4, 0.22), serial='serial')
     print('Object created:', prod1, sep='\n')
     prod1.update_parameters(serial='HX92', location='A3-73', conditions='Do not freeze')
     print('Parameters added:', prod1, sep='\n')
